@@ -173,7 +173,7 @@ class Analisi:
 
 
     def calculate_rms(self, idx=10, save_plot=True):
-        """Calculates RMS for a specific channel."""
+        """Calculates and plots noise distribution using one point in each waveform."""
         self.passed['noise'] = np.zeros((self.passed['w'].shape[0], 3))
         for channel in range(3):
             self.passed['noise'][:, channel] = self.passed['w'][:, channel, idx]
@@ -221,7 +221,7 @@ class Analisi:
 
 
     def plot_jitter(self, idx=10):
-        """Plots jitter distributions for each channel."""
+        """Plots jitter distributions for each channel using width of waveform[idx] / dV/dt"""
             
         os.makedirs(self.save_dir, exist_ok=True)
         fig, axes = plt.subplots(1, 3, figsize=(18, 6), sharey=True)
@@ -232,7 +232,7 @@ class Analisi:
             counts, edges, _ = ax.hist(self.passed["w"][:, ch, idx] / self.passed['dvdt_2080'][:, ch] * 1000, bins=50, color="tab:orange", alpha=0.7, label="Data")
             sigma_ufloat, popt, pcov, fit_x, fit_y = self.fit_gauss(counts, edges)
             ax.plot(fit_x, fit_y, linewidth=2, label=fr"Fit: $\sigma={sigma_ufloat}\,$ps", color="red")
-            ax.set_xlabel(rf"$N/(dV/dt)$ CH{ch+1} [ps]")
+            ax.set_xlabel(rf"$s/(dV/dt)$ CH{ch+1} [ps]")
             ax.set_ylabel("Counts")
             ax.grid(True)
             ax.legend()
@@ -262,7 +262,7 @@ class Analisi:
         plt.close()
 
     def plot_snr(self, cfd_val=0.3):
-        """Plots SNR distributions for each channel."""
+        """Plots SNR distributions for each channel with RMS of the full waveform"""
             
         os.makedirs(self.save_dir, exist_ok=True)
         fig, axes = plt.subplots(1, 3, figsize=(18, 6), sharey=True)
@@ -272,7 +272,7 @@ class Analisi:
             ax = axes[ch]
             ax.scatter(self.passed["cfd"][:, ch, cfd_idx], self.passed["pmax"][:, ch] / self.passed['rms'][:, ch], color="tab:orange", alpha=0.7)
             ax.set_xlabel(rf"CFD at {cfd_val} CH{ch+1} [ns]")
-            ax.set_ylabel("SNR")
+            ax.set_ylabel("SNR = Amplitude / RMS")
             ax.grid(True)
 
         plt.tight_layout()
@@ -354,7 +354,7 @@ class Analisi:
     
     
     def plot_amplitude_distribution(self):
-        """Plots amplitude histograms and applies Landau fits."""
+        """Plots amplitude histograms and applies Langauss fit."""
 
         if not self.passed:
             raise ValueError("Data cuts not applied. Call apply_cuts() first.")
