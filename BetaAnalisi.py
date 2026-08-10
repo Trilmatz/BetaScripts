@@ -21,12 +21,10 @@ class Analisi:
     using uproot, awkward, and pandas.
     """
     
-    def __init__(self, filename, bias, temperature=20, tree_name="Analysis"):
-        self.filepath = f"data/{temperature}C/{bias}V/{filename}"
+    def __init__(self, filename, input_path, output_path="plots", tree_name="Analysis"):
+        self.filepath = f"{input_path}/{filename}"
+        self.save_dir = output_path
         self.tree_name = tree_name
-        self.temperature = temperature
-
-        self.save_dir = f"plots/{temperature}C/{bias}V"
         
         # Load the ROOT file and tree
         self.file = uproot.open(self.filepath)
@@ -37,7 +35,7 @@ class Analisi:
         self.passed = {}
         self.rejected = {}
 
-        print(f"\n{'='*50}\nInitialized object to analyse measurement of {bias}V stored in {filename} at {temperature}C.\n{'='*50}\n")
+        print(f"\n{'='*50}\nInitialized object to analyse measurement stored in {self.filepath}.\n{'='*50}\n")
 
 
     @staticmethod
@@ -136,7 +134,7 @@ class Analisi:
         
         print(f"Loaded {self.raw['w'].shape[0]} events across {self.raw['w'].shape[1]} channels.")
 
-    def apply_cuts(self, min_thresholds, max_threshold=800, observable="pmax", cut_rms=None):
+    def apply_cuts(self, min_thresholds, max_thresholds=[800, 800, 800], observable="pmax", cut_rms=None):
         """
         Creates a boolean mask for the cuts and splits the dataset into 
         'passed' and 'rejected' events across all variables.
@@ -147,7 +145,8 @@ class Analisi:
         obs = self.raw[observable]
         
         # 1. Upper limit mask: All channels must be below max_threshold
-        upper_mask = np.all(obs < max_threshold, axis=1)
+        max_thresh_array = np.array(max_thresholds)
+        upper_mask = np.all(obs < max_thresh_array, axis=1)
         
         # 2. Lower limit mask: Each channel must be above its respective minimum threshold
         min_thresh_array = np.array(min_thresholds)
@@ -370,7 +369,7 @@ class Analisi:
             raw_pmax = self.raw['pmax'][:, ch]
             passed_pmax = self.passed['pmax'][:, ch]
             
-            bin_width = 20
+            bin_width = 10
             ax.hist(raw_pmax, bins=100, label="All Data", color="tab:blue", alpha=0.5)
             counts, edges, _ = ax.hist(passed_pmax, bins=np.arange(np.min(passed_pmax), np.max(passed_pmax), bin_width), label="Data (Passed Cuts)", color="tab:green", alpha=0.5)
 
@@ -380,7 +379,7 @@ class Analisi:
             ax.set_xlabel(rf"Amplitude CH{ch+1} [mV]")
             ax.set_yscale('log')
             if counts.max() > 0:
-                ax.set_ylim(1, counts.max() * 10)
+                ax.set_ylim(0.5, counts.max() * 10)
             ax.legend()
 
         axes[0].set_ylabel("Counts")
@@ -529,7 +528,7 @@ class Analisi:
         plt.plot([], [], color='red', label='Channel 2')
         plt.plot([], [], color='green', label='Channel 3')
 
-        plt.xlim(30, 45)
+        # plt.xlim(30, 45)
 
         plt.xlabel('Time (ns)')
         plt.ylabel('Amplitude (mV)')
@@ -546,22 +545,21 @@ if __name__ == "__main__":
     
     # Define arguments
     parser.add_argument("file_name", help="Name of the .root file")
-    parser.add_argument("voltage", type=int, help="Voltage value (e.g., 225)")
-    parser.add_argument("temperature", type=int, choices=[-20, 20], help="Temperature in Celsius")
-    parser.add_argument("cut1", type=int, help="Cut value for channel 1")
-    parser.add_argument("cut2", type=int, help="Cut value for channel 2")
-    parser.add_argument("cut3", type=int, help="Cut value for channel 3")
+    parser.add_argument("cuts", nargs=3, type=float, default=[40, 40, 40], help="Cut values for channels 1, 2, and 3")
+    parser.add_argument("--max_thresholds", nargs=3, type=float, default=[700, 700, 700], help="Maximum threshold values for channels 1, 2, and 3")
+    parser.add_argument("--input_path", default="data", help="Path to the input file")
+    parser.add_argument("--output_path", default="plots/sensor", help="Path to the output directory")
     
     # Parse the arguments
     args = parser.parse_args()
     # 1. Initialize the analyzer
-    analyzer = Analisi(args.file_name, args.voltage, temperature=args.temperature)
+    analyzer = Analisi(args.file_name, args.input_path, args.output_path)
 
     # 2. Load data
     analyzer.load_data()
     
     # Using thresholds: 25 for 170V, 40 for 190V, 70 for 210V
-    analyzer.apply_cuts((args.cut1, args.cut2, args.cut3), max_threshold=1200)
+    analyzer.apply_cuts(args.cuts, max_thresholds=args.max_thresholds)
     
     # 3. Create Plots
     analyzer.calculate_rms()
@@ -571,6 +569,5 @@ if __name__ == "__main__":
     analyzer.plot_waveforms(amplitude_threshold=1200)
     analyzer.plot_snr()
     analyzer.plot_cfd(cfd_val=0.3)
-    charge =analyzer.plot_charge()
-    print(charge)
+    charge = analyzer.plot_charge()
     analyzer.plot_jitter()
