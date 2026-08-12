@@ -34,5 +34,15 @@ bias_info = {
         170: {"name": "stats_2026-07-03_02-04-33_run.root", "cuts": (40, 40, 40), "upper_cut": 1200},
         175: {"name": "stats_2026-07-03_14-35-54_run.root", "cuts": (40, 40, 40), "upper_cut": 1200},
         180: {"name": "stats_2026-07-01_16-53-03_run.root", "cuts": (40, 40, 40), "upper_cut": 1200},
+    },
+
+    "CNM_W4_C18": {
+        220: {"name": "stats_2026-08-06_12-18-03_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        240: {"name": "stats_2026-08-07_16-17-42_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        260: {"name": "stats_2026-08-10_14-33-03_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        270: {"name": "stats_2026-08-10_23-18-34_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        275: {"name": "stats_2026-08-11_10-31-11_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        280: {"name": "stats_2026-08-11_17-46-45_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        285: {"name": "stats_2026-08-12_00-54-40_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
     }
 }
