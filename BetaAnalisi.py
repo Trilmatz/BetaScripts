@@ -74,11 +74,12 @@ class Analisi:
             amplitude = 0
         return mpv, popt, pcov, x_fit, y_fit, amplitude
 
-    def fit_gauss(self, counts, edges):
+    def fit_gauss(self, counts, edges, initial_guess=None):
         bin_width = edges[1] - edges[0]
         amplitude = np.sum(counts) * bin_width
         centers = 0.5 * (edges[:-1] + edges[1:])
-        initial_guess = [amplitude, 0, 5]
+        if initial_guess is None:
+            initial_guess = [amplitude, 0, 5]
         bounds = ([0.0, -np.inf, 0.0], [np.inf, np.inf, np.inf])
         sigma = np.where(counts > 0, np.sqrt(counts), 1.0)
         try:
@@ -229,9 +230,9 @@ class Analisi:
         for ch in range(3):
             ax = axes[ch]
             counts, edges, _ = ax.hist(self.passed["w"][:, ch, idx] / self.passed['dvdt_2080'][:, ch] * 1000, bins=50, color="tab:orange", alpha=0.7, label="Data")
-            sigma_ufloat, popt, pcov, fit_x, fit_y = self.fit_gauss(counts, edges)
+            sigma_ufloat, popt, pcov, fit_x, fit_y = self.fit_gauss(counts, edges, [200, 0, 10])
             ax.plot(fit_x, fit_y, linewidth=2, label=fr"Fit: $\sigma={sigma_ufloat}\,$ps", color="red")
-            ax.set_xlabel(rf"$s/(dV/dt)$ CH{ch+1} [ps]")
+            ax.set_xlabel(rf"$N/(dV/dt)$ CH{ch+1} [ps]")
             ax.set_ylabel("Counts")
             ax.grid(True)
             ax.legend()
@@ -388,7 +389,7 @@ class Analisi:
         plt.close()
 
 
-    def analyze_temporal_resolution(self, cfd_val=0.3, fit_func="gaussian"):
+    def analyze_temporal_resolution(self, cfd_val=0.3, fit_func="gaussian", res_timeref=None):
         """
         Plots time differences between channels and applies Gaussian fits.
         """
@@ -474,9 +475,13 @@ class Analisi:
 
             ax.set_xlabel(rf"ToA$_{{\text{{{pair_name}}}}}$ [ns]")
             ax.legend()
+            ax.grid(True)
 
         if all(s.nominal_value > 0 for s in sigmas):
-            sigma1_hyp = sigmas[0] / np.sqrt(2)
+            if res_timeref is not None:
+                sigma1_hyp = sqrt(sigmas[0]**2 - res_timeref**2) / np.sqrt(2)
+            else:
+                sigma1_hyp = sigmas[0] / np.sqrt(2)
             sigma1 = sqrt(sigmas[0]**2 + sigmas[1]**2 - sigmas[2]**2) / np.sqrt(2)
             sigma2 = sqrt(sigmas[0]**2 - sigmas[1]**2 + sigmas[2]**2) / np.sqrt(2)
             sigma3 = sqrt(-sigmas[0]**2 + sigmas[1]**2 + sigmas[2]**2) / np.sqrt(2)
