@@ -3,8 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from uncertainties import unumpy, ufloat_fromstr
 
-def plot_temporal_resolution(temperature=20):
-    filepath=f"plots/{temperature}C/sigmas.csv"
+def plot_temporal_resolution(prefix, temperature=20):
+    filepath=f"plots/{prefix}/sigmas.csv"
     sigmas_df = pd.read_csv(filepath, index_col=0)
     sigmas_df = sigmas_df.map(ufloat_fromstr)
     print("Loaded temporal resolution data:")
@@ -13,8 +13,8 @@ def plot_temporal_resolution(temperature=20):
     biases = sigmas_df.index
     labels = sigmas_df.columns
 
-    plt.figure(figsize=(10, 6))
-    for label in labels:
+    # plt.figure(figsize=(10, 6))
+    for label in labels[:]:
         plt.errorbar(
             biases, unumpy.nominal_values(sigmas_df[label]), yerr=unumpy.std_devs(sigmas_df[label]),
             fmt="o", label=f"{label}")
@@ -22,9 +22,10 @@ def plot_temporal_resolution(temperature=20):
     plt.xlabel("Bias [V]")
     plt.ylabel(fr"$\sigma$ [ps]")
     plt.legend(title=rf"$T = {temperature}\,$°C")
-    plt.ylim(0, 80)
+    plt.ylim(0, 70)
+    plt.grid()
     plt.tight_layout()
-    plt.savefig(f"plots/{temperature}C/temporal_res.pdf")
+    plt.savefig(f"plots/{prefix}/temporal_res.pdf")
     plt.close()
 
 def compare_resolutions():
@@ -57,6 +58,6 @@ def compare_resolutions():
 
 
 if __name__ == "__main__":
-    plot_temporal_resolution(20)
-    plot_temporal_resolution(-20)
-    compare_resolutions()
+    plot_temporal_resolution(prefix="CNM_W4_C18")
+    # plot_temporal_resolution(-20)
+    # compare_resolutions()

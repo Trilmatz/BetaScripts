@@ -3,13 +3,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from plotTemporalRes import plot_temporal_resolution
 from plotCharges import plot_charges
+from plotJitters import plot_jitters
+from plotNoise import plot_noise
 from uncertainties import unumpy, ufloat_fromstr
 
 def plot_values(df, temperature=20):
     biases = df.index
     labels = df.columns
 
-    plt.figure(figsize=(10, 6))
+    # plt.figure(figsize=(10, 6))
     for label in labels:
         try:
             plt.errorbar(
@@ -25,34 +27,11 @@ def plot_values(df, temperature=20):
     plt.savefig(f"plots/{temperature}C/values.pdf")
     plt.close()
 
-def plot_jitters(temperature=20):
-    filepath=f"plots/{temperature}C/jitter.csv"
-    jitters_df = pd.read_csv(filepath, index_col=0)
-    jitters_df = jitters_df.map(ufloat_fromstr)
-    print("Loaded jitter data:")
-    print(jitters_df)
-
-    biases = jitters_df.index
-    labels = jitters_df.columns
-
-    plt.figure(figsize=(10, 6))
-    for label in labels:
-        plt.errorbar(
-            biases, unumpy.nominal_values(jitters_df[label]), yerr=unumpy.std_devs(jitters_df[label]),
-            fmt="o", label=f"{label}")
-        # plt.plot(biases, jitters_df[label], 'o', label=f"{label}")
-    # plt.plot(sigmas)
-    plt.xlabel("Bias [V]")
-    plt.ylabel(r"$\sigma_{{\text{jitter}}} = N / (dV/dt)$ [ps]")
-    plt.legend(title=rf"$T = {temperature}\,$°C")
-    plt.ylim(bottom=0)
-    plt.tight_layout()
-    plt.savefig(f"plots/{temperature}C/jitters.pdf")
-    plt.close()
-
 
 if __name__ == "__main__":
     temperature = 20
-    plot_temporal_resolution(temperature=temperature)
-    plot_charges(temperature=temperature)
-    plot_jitters(temperature=temperature)
+    prefix = "CNM_W4_C18"
+    plot_temporal_resolution(prefix)
+    plot_charges(prefix)
+    plot_jitters(prefix)
+    plot_noise(prefix)
