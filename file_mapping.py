@@ -50,10 +50,27 @@ bias_info = {
     {
         # 220: {"name": "stats_.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
         # 240: {"name": "stats_.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
-        # 260: {"name": "stats_.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        260: {"name": "stats_2026-09-20_01-14-41_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
         270: {"name": "stats_2026-09-07_19-00-47_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
         275: {"name": "stats_2026-09-08_12-17-31_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
         280: {"name": "stats_2026-09-08_20-35-02_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
         285: {"name": "stats_2026-09-09_03-56-21_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        # 290: {"name": "stats_2026-09-16_15-27-50_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        290: {"name": "stats_2026-09-17_22-03-31_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        295: {"name": "stats_2026-09-16_22-23-06_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        # 300: {"name": "stats_2026-09-17_05-17-21_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+        300: {"name": "stats_2026-09-18_23-33-18_run.root", "cuts": (30, 30, 30), "upper_cuts": [700, 700, 700]},
+    },
+
+    "CNM_W4_F19P":
+    {
+        240: {"name": "stats_2026-09-13_02-10-00_run.root", "cuts": (1, 30, 30), "upper_cuts": [40, 700, 700]},
+        260: {"name": "stats_2026-09-13_08-03-55_run.root", "cuts": (1, 30, 30), "upper_cuts": [40, 700, 700]},
+        270: {"name": "stats_2026-09-13_13-58-16_run.root", "cuts": (1, 30, 30), "upper_cuts": [40, 700, 700]},
+        275: {"name": "stats_2026-09-11_15-50-48_run.root", "cuts": (1, 30, 30), "upper_cuts": [40, 700, 700]},
+        280: {"name": "stats_2026-09-09_15-08-57_run.root", "cuts": (1, 30, 30), "upper_cuts": [40, 700, 700]},
+        285: {"name": "stats_2026-09-13_19-53-48_run.root", "cuts": (1, 30, 30), "upper_cuts": [40, 700, 700]},
+        290: {"name": "stats_2026-09-14_01-48-40_run.root", "cuts": (1, 30, 30), "upper_cuts": [40, 700, 700]},
+        295: {"name": "stats_2026-09-14_07-40-38_run.root", "cuts": (1, 30, 30), "upper_cuts": [40, 700, 700]},
     }
 }
