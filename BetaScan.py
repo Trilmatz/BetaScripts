@@ -14,8 +14,17 @@ if temperature == -20:
 elif temperature == 20:
     biases = [150, 170, 190, 210, 215, 220, 225]
 
+path = "CNM/W4/C18"
 prefix = "CNM_W4_C18"
 biases = [220, 240, 260, 270, 275, 280, 285]
+
+path = "CNM/W4/H21"
+prefix = "CNM_W4_H21"
+biases = [260, 270, 275, 280, 285, 290, 295, 300]
+
+# path = "CNM/W4/F19P"
+# prefix = "CNM_W4_F19P"
+# biases = [240, 260, 270, 275, 280, 285, 290, 295]
 
 # biases = [220]
 sigmas = []
@@ -33,7 +42,7 @@ def plot_values(df, prefix, temperature=20):
     biases = df.index
     labels = df.columns
 
-    plt.figure(figsize=(10, 6))
+    # plt.figure(figsize=(10, 6))
     for label in labels:
         try:
             plt.errorbar(
@@ -51,34 +60,44 @@ def plot_values(df, prefix, temperature=20):
 
 
 for bias in biases:
-    path = "CNM/W4/C18"
-    analyzer = Analisi(bias_info[bias]["name"], f"data/{path}/{bias}V", f"plots/{prefix}/{bias}V")
+    try:
+        analyzer = Analisi(bias_info[bias]["name"], f"data/{path}/{bias}V", f"plots/{prefix}/{bias}V")
 
-    analyzer.load_data()
-    size = analyzer.apply_cuts(bias_info[bias]["cuts"], max_thresholds=bias_info[bias]["upper_cuts"])
-    sizes.append(size)
+        analyzer.load_data()
+        size = analyzer.apply_cuts(bias_info[bias]["cuts"], max_thresholds=bias_info[bias]["upper_cuts"])
+        sizes.append(size)
 
-    analyzer.plot_amplitude_distribution()
-    sigma_bias = analyzer.analyze_temporal_resolution(cfd_val=cfd_val, res_timeref=33.3)
-    sigmas.append(sigma_bias)
+        analyzer.plot_amplitude_distribution()
 
-    analyzer.plot_wfm_cut_validation(channel=0, num_events=200)
-    analyzer.plot_waveforms(amplitude_threshold=700)
-    analyzer.plot_snr(cfd_val=cfd_val)
-    analyzer.plot_cfd(cfd_val=cfd_val)
+        analyzer.plot_wfm_cut_validation(channel=0, num_events=200)
+        analyzer.plot_waveforms(amplitude_threshold=700)
+        analyzer.plot_snr(cfd_val=cfd_val)
+        analyzer.plot_cfd(cfd_val=cfd_val)
 
-    charge = analyzer.plot_charge()
-    charges.append(charge)
+        charge = analyzer.plot_charge()
+        charges.append(charge)
 
-    rms = analyzer.calculate_rms()
-    rms_values.append(rms)
-    jitter = analyzer.plot_jitter()
-    jitters.append(jitter)
+        rms = analyzer.calculate_rms()
+        rms_values.append(rms)
+
+        sigma_bias = analyzer.analyze_temporal_resolution(cfd_val=cfd_val, res_timeref=33.3)
+        sigmas.append(sigma_bias)
+
+        jitter = analyzer.plot_jitter()
+        jitters.append(jitter)
+    except Exception as e:
+        print(f"Error processing bias {bias}V: {e}")
 
 
 biases = np.array(biases)
 sigmas = np.array(sigmas)
 charges = np.array(charges)
+
+labels = ("1", "2", "3")
+charges_df = pd.DataFrame(charges, columns=labels, index = biases)
+charges_df.index.name = "bias"
+charges_df.to_csv(f"plots/{prefix}/charges.csv")
+
 rms_values = np.array(rms_values)
 jitters = np.array(jitters)
 
